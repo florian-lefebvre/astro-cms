@@ -13,7 +13,7 @@
   "dependencies": {
     "@astrojs/tailwind": "^5.1.0",
     "astro": "^4.5.5",
-    "package-name": "workspace:*",
+    "astro-cms": "workspace:*",
     "tailwindcss": "^3.4.1"
   },
   "devDependencies": {

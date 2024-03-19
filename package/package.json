@@ -1,34 +1,55 @@
 {
-  "name": "package-name",
-  "version": "0.0.0",
-  "description": "TODO:",
-  "author": {
-    "email": "TODO:",
-    "name": "TODO:",
-    "url": "TODO:"
-  },
-  "license": "MIT",
-  "keywords": [
-    "astro-integration",
-    "astro-component",
-    "withastro",
-    "astro",
-    "TODO:"
-  ],
-  "homepage": "TODO:",
-  "publishConfig": {
-    "access": "public"
-  },
-  "sideEffects": false,
-  "exports": {
-    ".": "./src/index.ts"
-  },
-  "scripts": {},
-  "type": "module",
-  "peerDependencies": {
-    "astro": "^4.0.0"
-  },
-  "dependencies": {
-    "astro-integration-kit": "^0.6.0"
-  }
+	"name": "astro-cms",
+	"version": "0.0.0",
+	"description": "TODO:",
+	"author": {
+		"email": "TODO:",
+		"name": "TODO:",
+		"url": "TODO:"
+	},
+	"license": "MIT",
+	"keywords": [
+		"astro-integration",
+		"astro-component",
+		"withastro",
+		"astro",
+		"TODO:"
+	],
+	"homepage": "TODO:",
+	"publishConfig": {
+		"access": "public"
+	},
+	"sideEffects": false,
+	"exports": {
+		".": {
+			"require": "./dist/index.cjs",
+			"import": "./dist/index.js"
+		},
+		"./config": {
+      "types": "./dist/config.d.ts",
+			"require": "./dist/config.cjs",
+			"import": "./dist/config.js"
+		}
+	},
+	"main": "./dist/index.cjs",
+	"module": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"typings": "./dist/index.d.ts",
+	"files": ["dist"],
+	"scripts": {
+		"dev": "vite build --watch",
+		"build": "vite build"
+	},
+	"type": "module",
+	"peerDependencies": {
+		"astro": "^4.0.0"
+	},
+	"dependencies": {
+		"astro-integration-kit": "^0.6.1"
+	},
+	"devDependencies": {
+		"@types/node": "^20.11.28",
+		"vite": "^5.1.6",
+		"vite-plugin-dts": "^3.7.3"
+	}
 }
