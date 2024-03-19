@@ -48,7 +48,7 @@
 		"astro-integration-kit": "^0.6.1"
 	},
 	"devDependencies": {
-		"@types/node": "^20.11.28",
+		"@types/node": "^20.11.30",
 		"vite": "^5.1.6",
 		"vite-plugin-dts": "^3.7.3"
 	}
