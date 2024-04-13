@@ -47,12 +47,14 @@ export const integration = defineIntegration({
 								const mod = await viteServer.ssrLoadModule(configPath);
 								resolvedConfig = resolveConfig(mod.default);
 								console.dir(resolvedConfig, { depth: null });
-								defineModule("virtual:astro-cms/resolved-config", {
-									constExports: {
-										resolvedConfig,
-									},
-								});
 							},
+						},
+					});
+
+					defineModule("virtual:astro-cms/resolved-config", {
+						constExports: {
+							resolvedConfig,
+							foo: "bar"
 						},
 					});
 
