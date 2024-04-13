@@ -1,29 +1,39 @@
 import { fileURLToPath } from "node:url";
-import { addVitePlugin, createResolver, defineIntegration } from "astro-integration-kit";
+import {
+	addIntegration,
+	addVitePlugin,
+	createResolver,
+	defineIntegration,
+	withPlugins,
+} from "astro-integration-kit";
 import { z } from "astro/zod";
 import { resolveConfig, type ResolvedConfig } from "./config.js";
+import tailwind from "@astrojs/tailwind";
+import inoxToolsPlugin from "@inox-tools/aik-mod";
 
 export const integration = defineIntegration({
 	optionsSchema: z
 		.object({
 			configFile: z.string().default("./cms.config.ts"),
-			base: z.string().default("/cms")
+			base: z.string().default("/cms"),
 		})
 		.default({}),
 	name: "astro-cms",
-	setup({ options }) {
-		const { resolve } = createResolver(import.meta.url)
+	setup({ options, name }) {
+		const { resolve } = createResolver(import.meta.url);
 
-		let resolvedConfig: ResolvedConfig
+		let resolvedConfig: ResolvedConfig;
 
-		return {
+		return withPlugins({
+			name,
+			plugins: [inoxToolsPlugin],
 			hooks: {
-				"astro:config:setup": (params) => {
-					const { config, injectRoute, logger } = params
+				"astro:config:setup": ({ defineModule, ...params }) => {
+					const { config, injectRoute, logger } = params;
 
 					if (config.output === "static") {
-						logger.error("`output: 'static'` is not supported.")
-						throw new Error("astro-cms failed.")
+						logger.error("`output: 'static'` is not supported.");
+						throw new Error("astro-cms failed.");
 					}
 
 					addVitePlugin(params, {
@@ -35,19 +45,31 @@ export const integration = defineIntegration({
 								);
 
 								const mod = await viteServer.ssrLoadModule(configPath);
-								resolvedConfig = resolveConfig(mod.default)
+								resolvedConfig = resolveConfig(mod.default);
 								console.dir(resolvedConfig, { depth: null });
+								defineModule("virtual:astro-cms/resolved-config", {
+									constExports: {
+										resolvedConfig,
+									},
+								});
 							},
 						},
 					});
 
+					addIntegration(params, {
+						integration: tailwind({
+							applyBaseStyles: false,
+							configFile: resolve("../assets/tailwind.config.mjs"),
+						}),
+					});
+
 					injectRoute({
-						entrypoint: resolve("../assets/routes/index.astro"),
+						entrypoint: resolve("../assets/pages/index.astro"),
 						pattern: `${options.base}/`,
-						prerender: false
-					})
+						prerender: false,
+					});
 				},
 			},
-		};
+		});
 	},
 });
