@@ -51,6 +51,7 @@ export const integration = defineIntegration({
 						},
 					});
 
+					// TODO: resolvedConfig is set after so it's
 					defineModule("virtual:astro-cms/resolved-config", {
 						constExports: {
 							resolvedConfig,
