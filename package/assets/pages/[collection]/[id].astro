@@ -1,0 +1,16 @@
+---
+const collectionId = Astro.params.collection
+
+if (collectionId !== "abc") {
+    return new Response(null, { status: 404, statusText: "Couldn't find collection" })
+}
+
+const entryId = Astro.params.id
+
+if (entryId !== "def") {
+    return new Response(null, { status: 404, statusText: "Couldn't find entry" })
+}
+
+export const prerender = false;
+---
+<h1>Collection {collectionId}. Entry {entryId}</h1>

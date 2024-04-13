@@ -1,0 +1,10 @@
+---
+const collectionId = Astro.params.collection
+
+if (collectionId !== "abc") {
+    return new Response(null, { status: 404, statusText: "Couldn't find collection" })
+}
+
+export const prerender = false;
+---
+<h1>Collection {collectionId}</h1>

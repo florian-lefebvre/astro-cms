@@ -1,8 +1,9 @@
 ---
 import "../styles/main.css"
-import { resolvedConfig, foo } from "virtual:astro-cms/resolved-config"
+import { resolvedConfig } from "virtual:astro-cms/resolved-config"
 
-console.log({ foo })
 console.dir(resolvedConfig, { depth: null })
+
+export const prerender = false;
 ---
 <h1 class="text-3xl font-bold">Index</h1>

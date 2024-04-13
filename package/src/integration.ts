@@ -54,7 +54,7 @@ export const integration = defineIntegration({
 					defineModule("virtual:astro-cms/resolved-config", {
 						constExports: {
 							resolvedConfig,
-							foo: "bar"
+							foo: "bar",
 						},
 					});
 
@@ -65,10 +65,30 @@ export const integration = defineIntegration({
 						}),
 					});
 
+					const getRouteOptions = (pattern: string) => ({
+						pattern: `${options.base}${pattern}`,
+						prerender: false,
+					});
+
 					injectRoute({
 						entrypoint: resolve("../assets/pages/index.astro"),
-						pattern: `${options.base}/`,
-						prerender: false,
+						...getRouteOptions("/"),
+					});
+					injectRoute({
+						entrypoint: resolve("../assets/pages/[collection]/index.astro"),
+						...getRouteOptions("/[collection]"),
+					});
+					injectRoute({
+						entrypoint: resolve("../assets/pages/[collection]/[id].astro"),
+						...getRouteOptions("/[collection]/[id]"),
+					});
+					injectRoute({
+						entrypoint: resolve("../assets/pages/__api/[collection]/index.ts"),
+						...getRouteOptions("/__api/[collection]"),
+					});
+					injectRoute({
+						entrypoint: resolve("../assets/pages/__api/[collection]/[id].ts"),
+						...getRouteOptions("/__api/[collection]/[id]"),
 					});
 				},
 			},
