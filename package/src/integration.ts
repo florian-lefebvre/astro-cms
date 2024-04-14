@@ -1,14 +1,13 @@
 import { fileURLToPath } from "node:url";
 import {
-	addIntegration,
 	addVirtualImports,
 	addVitePlugin,
 	createResolver,
 	defineIntegration,
+	watchDirectory,
 	withPlugins,
 } from "astro-integration-kit";
 import { resolveConfig, type ResolvedConfig } from "./config.js";
-import tailwind from "@astrojs/tailwind";
 import inoxToolsPlugin from "@inox-tools/aik-mod";
 import { optionsSchema } from "./options.js";
 
@@ -31,6 +30,9 @@ export const integration = defineIntegration({
 						logger.error("`output: 'static'` is not supported.");
 						throw new Error("astro-cms failed.");
 					}
+
+					// TODO: find a way to have this only in the playground
+					watchDirectory(params, resolve("../assets/"));
 
 					const configPath = fileURLToPath(
 						new URL(options.configFile, config.root),
@@ -66,13 +68,6 @@ export const integration = defineIntegration({
 								root: config.root,
 							},
 						},
-					});
-
-					addIntegration(params, {
-						integration: tailwind({
-							applyBaseStyles: false,
-							configFile: resolve("../assets/tailwind.config.mjs"),
-						}),
 					});
 
 					const getRouteOptions = (pattern: string) => ({
