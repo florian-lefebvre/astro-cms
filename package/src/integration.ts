@@ -1,23 +1,19 @@
 import { fileURLToPath } from "node:url";
 import {
 	addIntegration,
+	addVirtualImports,
 	addVitePlugin,
 	createResolver,
 	defineIntegration,
 	withPlugins,
 } from "astro-integration-kit";
-import { z } from "astro/zod";
 import { resolveConfig, type ResolvedConfig } from "./config.js";
 import tailwind from "@astrojs/tailwind";
 import inoxToolsPlugin from "@inox-tools/aik-mod";
+import { optionsSchema } from "./options.js";
 
 export const integration = defineIntegration({
-	optionsSchema: z
-		.object({
-			configFile: z.string().default("./cms.config.ts"),
-			base: z.string().default("/cms"),
-		})
-		.default({}),
+	optionsSchema,
 	name: "astro-cms",
 	setup({ options, name }) {
 		const { resolve } = createResolver(import.meta.url);
@@ -29,33 +25,46 @@ export const integration = defineIntegration({
 			plugins: [inoxToolsPlugin],
 			hooks: {
 				"astro:config:setup": ({ defineModule, ...params }) => {
-					const { config, injectRoute, logger } = params;
+					const { config, injectRoute, logger, addMiddleware } = params;
 
 					if (config.output === "static") {
 						logger.error("`output: 'static'` is not supported.");
 						throw new Error("astro-cms failed.");
 					}
 
+					const configPath = fileURLToPath(
+						new URL(options.configFile, config.root),
+					);
+
 					addVitePlugin(params, {
 						plugin: {
 							name: "astro-cms-vite-plugin",
 							async configureServer(viteServer) {
-								const configPath = fileURLToPath(
-									new URL(options.configFile, config.root),
-								);
-
 								const mod = await viteServer.ssrLoadModule(configPath);
 								resolvedConfig = resolveConfig(mod.default);
-								console.dir(resolvedConfig, { depth: null });
+								// console.dir(resolvedConfig, { depth: null });
 							},
 						},
 					});
 
-					// TODO: resolvedConfig is set after so it's
-					defineModule("virtual:astro-cms/resolved-config", {
+					addVirtualImports(params, {
+						name,
+						imports: {
+							"virtual:astro-cms/raw-config": `import * as mod from ${JSON.stringify(
+								configPath,
+							)};
+							
+							export const rawConfig = mod.default;
+							`,
+						},
+					});
+
+					defineModule("virtual:astro-cms/internal", {
 						constExports: {
-							resolvedConfig,
-							foo: "bar",
+							options,
+							astroConfig: {
+								root: config.root,
+							},
 						},
 					});
 
@@ -69,6 +78,11 @@ export const integration = defineIntegration({
 					const getRouteOptions = (pattern: string) => ({
 						pattern: `${options.base}${pattern}`,
 						prerender: false,
+					});
+
+					addMiddleware({
+						entrypoint: resolve("../assets/middleware.ts"),
+						order: "pre",
 					});
 
 					injectRoute({

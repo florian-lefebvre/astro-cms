@@ -1,7 +1,9 @@
 ---
 const collectionId = Astro.params.collection
 
-if (collectionId !== "abc") {
+const { resolvedConfig } = Astro.locals.__cms
+
+if (!collectionId || !resolvedConfig.collections.map(e => e.id).includes(collectionId)) {
     return new Response(null, { status: 404, statusText: "Couldn't find collection" })
 }
 
